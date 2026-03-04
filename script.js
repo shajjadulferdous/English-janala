@@ -3,6 +3,7 @@ const loadLeason = () =>{
     .then(res => res.json())
     .then(res => displayLeason(res))
 }
+
 const displayLeason = (leasons) =>{
     const allLeason = document.getElementById('level-containers');
     allLeason.innerHTML ="";
@@ -15,9 +16,11 @@ const displayLeason = (leasons) =>{
         allLeason.append(div);
     });
 }
+
 loadLeason();
 
 const loadLevelWord = (level_no) =>{
+      manageSpiner(true);
       fetch(`https://openapi.programming-hero.com/api/level/${level_no}`)
       .then(res => res.json())
       .then(res =>{ 
@@ -27,6 +30,7 @@ const loadLevelWord = (level_no) =>{
         theActiveBtn.classList.add('active');
     });
 }
+
 const removeActiveClass = () =>{
     const allLevel = document.querySelectorAll('.optional');
     console.log(allLevel);
@@ -34,6 +38,7 @@ const removeActiveClass = () =>{
         ele.classList.remove('active');
     })
 }
+
 const displayLevelWord = (words) =>{
     const wordContainers = document.getElementById('word-containers');
     wordContainers.innerHTML = '';
@@ -46,6 +51,7 @@ const displayLevelWord = (words) =>{
              <p>এই Lesson এ এখনো কোন Vocabulary যুক্ত করা হয়নি।</p>
              <h1 class="text-4xl font-semibold">নেক্সট Lesson এ যান</h1>
         </div>`
+        manageSpiner(false);
         return;
     }
 
@@ -60,10 +66,57 @@ const displayLevelWord = (words) =>{
             <h2 class="text-2xl font-bangla font-semibold">"${element.meaning?element.meaning :"অর্থ পাওয়া যায়নি"} / ${element.pronunciation?element.pronunciation:"Pronounciation পাওয়া  যায়নি"}"</h2>
             </div>
             <div class="flex justify-between">
-                <button class="btn"><i class="fa-solid fa-circle-info"></i></button>
+                <button onClick="loadWordDetails(${element?.id})" class="btn"><i class="fa-solid fa-circle-info"></i></button>
                 <button class="btn"><i class="fa-solid fa-volume-low"></i></button>
             </div>`;
             borodiv.append(div);
         })
       wordContainers.append(borodiv);
+      manageSpiner(false);
+}
+
+const loadWordDetails = async (id)=>{
+     const  url = `https://openapi.programming-hero.com/api/word/${id}`;
+     const  res  = await fetch(url);
+     const details = await res.json();
+     displayWordDetails(details?.data);
+}
+
+const createElementSym = (arr) =>{
+    const htmlElements = arr.map(ele =>{
+        return `<span class="btn">${ele}</span>`
+    });
+    return htmlElements.join(" ");
+}
+const displayWordDetails = (word) =>{
+     const detailsBox = document.getElementById('details-box');
+     console.log(word);
+     detailsBox.innerHTML = `<div class="space-y-2">
+         <h1 class="font-bold text-3xl">${word.word} <i class="fa-solid fa-microphone-lines"> </i>${word.pronunciation} </h1>
+         <div>
+         <h2 class="font-bold text-xl">Meaning</h2>
+         <p class="font-bold">${word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"}</p>
+         </div>
+         <div>
+             <h2 class="font-bold text-xl">Example</h2>
+             <p class="">${word.sentence ? word.sentence : "Example পাওয়া যায়নি"}</p>
+         </div>
+         <div>
+            <h1 class="font-bangla font-bold mb-1">সমার্থক শব্দ গুলো</h1>
+            <div> ${word.synonyms.length ? createElementSym(word.synonyms) : "সমার্থক শব্দ পাওয়া যায়নি"} </div>
+         </div>
+    </div>`;
+     const value = document.getElementById('my_modal_5');
+     value.showModal();
+}
+
+const manageSpiner = (status)=>{
+     if (status == true){
+         document.getElementById('spiner').classList.remove('hidden');
+         document.getElementById('word-containers').classList.add('hidden');
+     }
+     else{
+        document.getElementById('spiner').classList.add('hidden');
+        document.getElementById('word-containers').classList.remove('hidden');
+     }
 }

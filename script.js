@@ -24,7 +24,8 @@ const loadLevelWord = (level_no) =>{
       fetch(`https://openapi.programming-hero.com/api/level/${level_no}`)
       .then(res => res.json())
       .then(res =>{ 
-        displayLevelWord(res)
+        const words = res?.data;
+        displayLevelWord(words)
         removeActiveClass();
         const theActiveBtn = document.getElementById(`lesson-btn-${level_no}`);
         theActiveBtn.classList.add('active');
@@ -39,10 +40,9 @@ const removeActiveClass = () =>{
     })
 }
 
-const displayLevelWord = (words) =>{
+const displayLevelWord = (arr) =>{
     const wordContainers = document.getElementById('word-containers');
     wordContainers.innerHTML = '';
-    const arr = words ?.data;
     if(arr.length === 0){
         wordContainers.innerHTML = `<div class="font-bangla p-10  text-center space-y-3">
              <div class="flex justify-center items-center">
@@ -120,3 +120,16 @@ const manageSpiner = (status)=>{
         document.getElementById('word-containers').classList.remove('hidden');
      }
 }
+
+document.getElementById('btn-search').addEventListener('click' , () =>{
+    removeActiveClass();
+    const input = document.getElementById('input-search');
+    const serchValue = input.value;
+    fetch(`https://openapi.programming-hero.com/api/words/all`)
+    .then(res => res.json())
+    .then((data) =>{
+         const allword = data.data;
+         const filterWords = allword.filter((word) =>word.word.toLowerCase().includes(serchValue));
+         displayLevelWord(filterWords);
+    })
+})

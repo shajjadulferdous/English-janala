@@ -1,5 +1,3 @@
-
-
 const loadLeason = () =>{
     fetch(`https://openapi.programming-hero.com/api/levels/all`)
     .then(res => res.json())
@@ -11,21 +9,31 @@ const displayLeason = (leasons) =>{
     const data = leasons?.data;
     data.forEach(element => {
         const div  = document.createElement('div');
-        div.innerHTML = `<button onclick="loadLevelWord(${element.level_no})" class="btn btn-outline btn-primary p-4">
+        div.innerHTML = `<button id="lesson-btn-${element.level_no}" onclick="loadLevelWord(${element.level_no})" class="btn btn-outline btn-primary p-4 optional">
                 <i class="fa-solid fa-book-open"></i>Leason-${element.level_no}
             </button>`;
         allLeason.append(div);
     });
-    console.log(allLeason)
 }
 loadLeason();
 
 const loadLevelWord = (level_no) =>{
       fetch(`https://openapi.programming-hero.com/api/level/${level_no}`)
       .then(res => res.json())
-      .then(res => displayLevelWord(res));
+      .then(res =>{ 
+        displayLevelWord(res)
+        removeActiveClass();
+        const theActiveBtn = document.getElementById(`lesson-btn-${level_no}`);
+        theActiveBtn.classList.add('active');
+    });
 }
-
+const removeActiveClass = () =>{
+    const allLevel = document.querySelectorAll('.optional');
+    console.log(allLevel);
+    allLevel.forEach(ele =>{
+        ele.classList.remove('active');
+    })
+}
 const displayLevelWord = (words) =>{
     const wordContainers = document.getElementById('word-containers');
     wordContainers.innerHTML = '';
@@ -40,7 +48,7 @@ const displayLevelWord = (words) =>{
         </div>`
         return;
     }
-    
+
     const borodiv = document.createElement('div');
     borodiv.className = `grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-between p-4`;
     arr.forEach(element =>{

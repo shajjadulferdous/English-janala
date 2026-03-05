@@ -135,7 +135,7 @@ document.getElementById('btn-search').addEventListener('click' , () =>{
     .then(res => res.json())
     .then((data) =>{
          const allword = data.data;
-         const filterWords = allword.filter((word) =>word.word.toLowerCase().includes(serchValue));
+         const filterWords = allword.filter((word) =>word.word.toLowerCase().includes(serchValue.toLowerCase()));
          displayLevelWord(filterWords);
     })
 })
